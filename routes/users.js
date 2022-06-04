@@ -65,7 +65,7 @@ router.put('/:id', (req, res, next) => {
   }
   users.splice(found, 1, newUser);
 
-  res.json(users);
+  res.json(users);s
 });
 
 
