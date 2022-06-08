@@ -2,7 +2,9 @@ const { application } = require('express');
 var express = require('express');
 var router = express.Router();
 
-var column = require('../repository/users.js');
+// var column = require('../repository/users.js');
+var column = require('../repository/userDb.js');
+const db = require('../repository/db.js');
 
 // const users = [
 //   {
@@ -25,33 +27,51 @@ var column = require('../repository/users.js');
 // ]
 
 router.get('/:id', (req, res, next) => {
-  const users = column.findOne(req.params.id)
-  res.send(users);
+  db.query(`SELECT * FROM user`, (err, data) => {    
+    const users = column.findOne(data, req.params.id)
+    res.send(users);
+  });
 });
 
 router.post('/', (req, res, next) => {
-  const newUser = column.insert(req);
-  res.json(newUser);
+  db.query(`SELECT * FROM user`, (err, data) => {
+    const newUsers = column.insert(data, req);
+    db.query(`INSERT INTO user (id, name, age) VALUES(?, ?, ?)`, [newUsers.id, req.body.name, req.body.age], 
+        (err2, data) => {
+          res.json(newUsers);
+        })
+  });  
 });
 
 
 router.delete('/:id', (req, res, next) => {
-  const users = column.remove(req.params.id);
-  res.json(users);  
+  db.query(`DELETE FROM user WHERE id=?`, req.params.id,
+    (err2, result) => {
+      db.query(`SELECT * FROM user`, (err, data) => {    
+        const users = column.findAll(data);
+        res.json(users);
+      });
+    })
 });
 
 router.put('/:id', (req, res, next) => {
-  const users = column.update(req, req.params.id);
-  res.json(users);
+  db.query(`SELECT * FROM user`, (err, data) => {
+    db.query(`UPDATE user SET name=?, age=? WHERE id=?` , [req.body.name, req.body.age, req.params.id],
+    (err2, data2) => {
+      const users = column.update(data, req, req.params.id);
+      res.json(users);
+    });
+  });
 });
-
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  console.log('GET users listing')
+  console.log('GET users listing');
   // res.send("{\"name\":\"hyeonjae\"}");
-  const users = column.findAll();
-  res.json(users);
+  db.query(`SELECT * FROM user`, (err, data) => {    
+    const users = column.findAll(data);
+    res.json(users);
+  });
 });
 
 module.exports = router;

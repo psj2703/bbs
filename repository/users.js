@@ -27,9 +27,7 @@ const column = {
         }
         users.user.push(newUser);
 
-        console.log(users);
         const userJSON = JSON.stringify(users)
-        console.log();
 
         fs.writeFile("./repository/test.json", userJSON, function(err) {
             if (err) {
