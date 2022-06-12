@@ -12,8 +12,7 @@ const column = {
     
     findOne : function (id) {
         return new Promise((resolve, reject) => {
-            db.query(`SELECT * FROM user`, (err, list) => {       
-                const result = list.find(element => element.id === id)
+            db.query(`SELECT * FROM user WHERE id =?`, [id], (err, result) => {       
                 resolve(result)
               });
         });
