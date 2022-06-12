@@ -13,77 +13,66 @@
 // INSERT INTO user VALUES (103, 'dongil', 41);
 // INSERT INTO user VALUES (104, 'seongjae', 38);
 
-
-
+const db = require('./db.js');
 
 const column = {
-    findAll : function (data) {
-        let result = {
-            "user": []
-        };
-        let i = 0;
-        while(i < data.length) {
-            newUser = {
-                "id": Number(data[i].id),
-                "name" : data[i].name,
-                "age": Number(data[i].age)
-            }
-            result.user.push(newUser);
-            i++
-        }
-        return result.user;
+    findAll : function () {
+        return new Promise((resolve, reject) => {
+            db.query('SELECT * FROM user', function(err, rows) {
+                console.log(rows)
+                resolve(rows)
+            })
+        })
     },
     
-    findOne : function (data, fvalue) {
-        let result = {
-            "user": []
-        };
-        let i = 0;
-        while(i < data.length) {
-            newUser = {
-                "id": Number(data[i].id),
-                "name" : data[i].name,
-                "age": Number(data[i].age)
-            }
-            result.user.push(newUser);
-            i++
-        }
-        result = result.user.find( element => element.id == fvalue);
-        return result;
+    findOne : function (id) {
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT * FROM user`, (err, list) => {       
+                const result = list.find(element => element.id === id)
+                resolve(result)
+              });
+        });
     },
     
-    insert : function (data, req) {
-        const users = this.findAll(data);
-        const ids = users.map(user => user.id)
-        const maxId = Math.max(...ids) + 1
-      
-        const { body } = req
-        const { name, age } = body
-      
-        const newUser = {
-            "id": Number(maxId),
-            "name" : name,
-            "age": Number(age)
-        }
-        return newUser;
+    insert : function(req, id) {
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT * FROM user`, (err, data) => {
+                const ids = data.map(user => user.id);
+                const maxId = Math.max(...ids) + 1;
+            
+                const { body } = req;
+                const { name, age } = body;
+
+                const newUser = {
+                    "id": Number(maxId),
+                    "name" : name,
+                    "age": Number(age)
+                }
+
+                db.query(`INSERT INTO user (id, name, age) VALUES(?, ?, ?)`, [newUser.id, newUser.name, newUser.age], 
+                    (err2, data2) => {
+                    resolve(newUser);
+                }
+                );
+            });
+        });
     },
     
-    remove : function (data) {
-        const users = this.findAll(data)
-        return users;
+    remove : function (req) {
+        return new Promise((resolve, reject) => {
+            db.query(`DELETE FROM user WHERE id=?`, req, (err2, result) => {
+                resolve(result);
+            });
+        })
     },
     
-    update : function (data, req, fvalue) {
-        const users = this.findAll(data)
-        const found = users.findIndex(element => element.id == fvalue);
-        const newUser = {
-          "id": Number(fvalue),
-          "name": req.body.name,
-          "age": req.body.age
-        }
-        users.splice(found, 1, newUser);
-        const userJSON = JSON.stringify(users)
-        return users;
+    update : function (req, id) {
+        return new Promise((resolve, reject) => {
+            db.query(`UPDATE user SET name=?, age=? WHERE id=?`, [req.body.name, req.body.age, id],
+            (err, data) => {
+                resolve(data);
+            });
+        })
     }
 }
 
