@@ -1,18 +1,3 @@
-// CREATE DATABASE bbs_user_db;
-
-// USE bbs_user_db;
-
-// CREATE TABLE user
-// (   id    INT(10) NOT NULL PRIMARY KEY,
-//     name  VARCHAR(30) NOT NULL,
-//     age   INT NOT NULL
-// );
-
-// INSERT INTO user VALUES (101, 'hyunjae', 35);
-// INSERT INTO user VALUES (102, 'jinsuk', 35);
-// INSERT INTO user VALUES (103, 'dongil', 41);
-// INSERT INTO user VALUES (104, 'seongjae', 38);
-
 const db = require('./db.js');
 
 const column = {
